@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        Int            @id @default(autoincrement())
+  nome      String
+  email     String         @unique
+  senha     String
+  perfil    PerfilUsuario
+  ativo     Boolean        @default(true)
+  createdAt DateTime       @default(now())
+
+  @@map("usuarios")
+}
+
+model Abrigo {
+  id            Int           @id @default(autoincrement())
+  nome          String
+  endereco      String
+  cidade        String
+  capacidade    Int
+  responsavel   String
+  status        StatusAbrigo
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("abrigos")
+}
+enum StatusAbrigo {
+  ATIVO
+  INATIVO
+  LOTADO
+  MANUTENCAO
+}
+
+enum PerfilUsuario {
+  ADMIN
+  GESTOR
+  VOLUNTARIO
+}
+
+model PessoaAcolhida {
+  id              Int                       @id @default(autoincrement())
+
+  nome            String
+  cpf             String?                   @unique
+  dataNascimento  DateTime?
+  telefone        String?
+  observacoes     String?
+  sexo            Sexo?
+  status          StatusPessoaAcolhida      @default(ACOLHIDO)
+
+  abrigoId        Int
+  abrigo          Abrigo                    @relation(fields: [abrigoId], references: [id])
+
+  necessidades    NecessidadeEspecial[]
+
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  @@map("pessoas_acolhidas")
+}
+
+enum Sexo {
+  MASCULINO
+  FEMININO
+  OUTRO
+}
+
+model NecessidadeEspecial {
+  id                Int              @id @default(autoincrement())
+
+  descricao         String
+
+  pessoaAcolhidaId  Int
+  pessoaAcolhida    PessoaAcolhida   @relation(fields: [pessoaAcolhidaId], references: [id])
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@map("necessidades_especiais")
+}
+
+enum StatusPessoaAcolhida {
+  ACOLHIDO
+  TRANSFERIDO
+  DESLIGADO
+  FALECIDO
+}
