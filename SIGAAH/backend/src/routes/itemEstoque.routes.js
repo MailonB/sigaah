@@ -1,45 +1,49 @@
+
 const express = require('express');
 const router = express.Router();
 
-const abrigoController = require('../controllers/abrigo.controller');
+const controller =
+  require('../controllers/itemEstoque.controller');
 
-const authMiddleware = require('../middlewares/auth.middleware');
-const permitir = require('../middlewares/perfil.middleware');
+const authMiddleware =
+  require('../middlewares/auth.middleware');
+
+const permitir =
+  require('../middlewares/perfil.middleware');
 
 router.get(
   '/',
   authMiddleware,
   permitir('ADMIN', 'GESTOR', 'VOLUNTARIO'),
-  abrigoController.listar
+  controller.listar
 );
 
 router.get(
   '/:id',
   authMiddleware,
   permitir('ADMIN', 'GESTOR', 'VOLUNTARIO'),
-  abrigoController.buscarPorId
+  controller.buscarPorId
 );
 
 router.post(
   '/',
   authMiddleware,
   permitir('ADMIN', 'GESTOR'),
-  abrigoController.criar
+  controller.criar
 );
 
 router.put(
   '/:id',
   authMiddleware,
   permitir('ADMIN', 'GESTOR'),
-  abrigoController.atualizar
+  controller.atualizar
 );
 
 router.delete(
   '/:id',
   authMiddleware,
   permitir('ADMIN'),
-  abrigoController.excluir
+  controller.excluir
 );
-
 
 module.exports = router;

@@ -4,14 +4,41 @@ const router = express.Router();
 const usuarioController = require('../controllers/usuario.controller');
 
 const authMiddleware = require('../middlewares/auth.middleware');
+const permitir = require('../middlewares/perfil.middleware');
 
-router.get('/', authMiddleware, usuarioController.listar);
-router.get('/:id', authMiddleware, usuarioController.buscarPorId);
+router.get(
+  '/',
+  authMiddleware,
+  permitir('ADMIN', 'GESTOR'),
+  usuarioController.listar
+);
 
-router.post('/', authMiddleware, usuarioController.criar);
+router.get(
+  '/:id',
+  authMiddleware,
+  permitir('ADMIN', 'GESTOR'),
+  usuarioController.buscarPorId
+);
 
-router.put('/:id', authMiddleware, usuarioController.atualizar);
+router.post(
+  '/',
+  authMiddleware,
+  permitir('ADMIN'),
+  usuarioController.criar
+);
 
-router.delete('/:id', authMiddleware, usuarioController.excluir);
+router.put(
+  '/:id',
+  authMiddleware,
+  permitir('ADMIN'),
+  usuarioController.atualizar
+);
+
+router.delete(
+  '/:id',
+  authMiddleware,
+  permitir('ADMIN'),
+  usuarioController.excluir
+);
 
 module.exports = router;

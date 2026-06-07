@@ -1,7 +1,14 @@
-function permitir(...perfis) {
+function permitir(...perfisPermitidos) {
+
   return (req, res, next) => {
 
-    if (!perfis.includes(req.usuario.perfil)) {
+    if (!req.usuario) {
+      return res.status(401).json({
+        erro: 'Usuário não autenticado'
+      });
+    }
+
+    if (!perfisPermitidos.includes(req.usuario.perfil)) {
       return res.status(403).json({
         erro: 'Acesso negado'
       });

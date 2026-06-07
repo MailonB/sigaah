@@ -12,31 +12,36 @@ datasource db {
 }
 
 model Usuario {
-  id        Int            @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   nome      String
-  email     String         @unique
+  email     String        @unique
   senha     String
   perfil    PerfilUsuario
-  ativo     Boolean        @default(true)
-  createdAt DateTime       @default(now())
+  ativo     Boolean       @default(true)
+  createdAt DateTime      @default(now())
 
   @@map("usuarios")
 }
 
 model Abrigo {
-  id            Int           @id @default(autoincrement())
-  nome          String
-  endereco      String
-  cidade        String
-  capacidade    Int
-  responsavel   String
-  status        StatusAbrigo
+  id          Int          @id @default(autoincrement())
+  nome        String
+  endereco    String
+  cidade      String
+  capacidade  Int
+  responsavel String
+  status      StatusAbrigo
 
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  pessoas PessoaAcolhida[]
+   solicitacoes SolicitacaoAjuda[]
+   itensEstoque ItemEstoque[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@map("abrigos")
 }
+
 enum StatusAbrigo {
   ATIVO
   INATIVO
@@ -51,23 +56,23 @@ enum PerfilUsuario {
 }
 
 model PessoaAcolhida {
-  id              Int                       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  nome            String
-  cpf             String?                   @unique
-  dataNascimento  DateTime?
-  telefone        String?
-  observacoes     String?
-  sexo            Sexo?
-  status          StatusPessoaAcolhida      @default(ACOLHIDO)
+  nome           String
+  cpf            String?              @unique
+  dataNascimento DateTime?
+  telefone       String?
+  observacoes    String?
+  sexo           Sexo?
+  status         StatusPessoaAcolhida @default(ACOLHIDO)
 
-  abrigoId        Int
-  abrigo          Abrigo                    @relation(fields: [abrigoId], references: [id])
+  abrigoId Int
+  abrigo   Abrigo @relation(fields: [abrigoId], references: [id])
 
-  necessidades    NecessidadeEspecial[]
+  necessidades NecessidadeEspecial[]
 
-  createdAt       DateTime                  @default(now())
-  updatedAt       DateTime                  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("pessoas_acolhidas")
 }
@@ -78,23 +83,140 @@ enum Sexo {
   OUTRO
 }
 
-model NecessidadeEspecial {
-  id                Int              @id @default(autoincrement())
-
-  descricao         String
-
-  pessoaAcolhidaId  Int
-  pessoaAcolhida    PessoaAcolhida   @relation(fields: [pessoaAcolhidaId], references: [id])
-
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-
-  @@map("necessidades_especiais")
-}
-
 enum StatusPessoaAcolhida {
   ACOLHIDO
   TRANSFERIDO
   DESLIGADO
   FALECIDO
+}
+
+model NecessidadeEspecial {
+  id Int @id @default(autoincrement())
+
+  tipo      TipoNecessidade @default(OUTRA)
+  descricao String
+
+  pessoaAcolhidaId Int
+  pessoaAcolhida   PessoaAcolhida @relation(fields: [pessoaAcolhidaId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("necessidades_especiais")
+}
+
+enum TipoNecessidade {
+  MEDICAMENTO
+  ALIMENTACAO
+  MOBILIDADE
+  PSICOLOGICA
+  OUTRA
+}
+
+model Voluntario {
+  id Int @id @default(autoincrement())
+
+  nome     String
+  cpf      String  @unique
+  telefone String
+  email    String?
+
+  especialidade EspecialidadeVoluntario @default(OUTRO)
+
+  disponibilidade String?
+  observacoes     String?
+
+  ativo Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("voluntarios")
+}
+
+enum EspecialidadeVoluntario {
+  MEDICO
+  ENFERMEIRO
+  PSICOLOGO
+  BOMBEIRO
+  MOTORISTA
+  COZINHEIRO
+  ASSISTENTE_SOCIAL
+  SEGURANCA
+  OUTRO
+}
+
+enum PrioridadeSolicitacao {
+  BAIXA
+  MEDIA
+  ALTA
+  URGENTE
+}
+
+enum StatusSolicitacao {
+  ABERTA
+  EM_ATENDIMENTO
+  ATENDIDA
+  CANCELADA
+}
+
+model SolicitacaoAjuda {
+  id            Int                  @id @default(autoincrement())
+
+  titulo        String
+  descricao     String
+
+  prioridade    PrioridadeSolicitacao @default(MEDIA)
+  status        StatusSolicitacao      @default(ABERTA)
+
+  abrigoId      Int
+  abrigo        Abrigo @relation(fields: [abrigoId], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("solicitacoes_ajuda")
+}
+model ItemEstoque {
+  id              Int      @id @default(autoincrement())
+
+  nome            String
+  descricao       String?
+
+  quantidade      Int      @default(0)
+  quantidadeMinima Int     @default(0)
+
+  abrigoId        Int
+  abrigo          Abrigo   @relation(fields: [abrigoId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  movimentacoes   MovimentacaoEstoque[]
+
+  @@map("itens_estoque")
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+  DOACAO
+  AJUSTE
+}
+
+model MovimentacaoEstoque {
+  id            Int               @id @default(autoincrement())
+
+  tipo          TipoMovimentacao
+
+  quantidade    Int
+
+  observacao    String?
+
+  itemId        Int
+  item          ItemEstoque       @relation(fields: [itemId], references: [id])
+
+  createdAt     DateTime          @default(now())
+
+  @@map("movimentacoes_estoque")
 }
