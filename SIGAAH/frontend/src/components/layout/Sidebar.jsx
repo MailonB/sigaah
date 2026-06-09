@@ -9,16 +9,30 @@ import {
   LogOut,
 } from "lucide-react";
 import "./Sidebar.css";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { FileText } from "lucide-react";
+import { Siren } from "lucide-react";
 
 function Sidebar() {
+
+const navigate = useNavigate();
+const { logout } = useAuth();
+
+const handleLogout = () => {
+  logout();
+  navigate("/login");
+};
+
   const menu = [
     { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { label: "Abrigos", path: "/abrigos", icon: Home },
-    { label: "Pessoas", path: "/pessoas", icon: Users },
+    { label: "Pessoas", path: "/pessoas-acolhidas", icon: Users },
     { label: "Estoque", path: "/estoque", icon: Package },
     { label: "Voluntários", path: "/voluntarios", icon: HeartHandshake },
     { label: "Solicitações", path: "/solicitacoes", icon: ClipboardList },
-  ];
+    { label: "Relatórios", path: "/relatorios", icon: FileText },
+    { label: "Central de Operações", path: "/central", icon: Siren },];
 
   return (
     <aside className="sidebar">
@@ -46,8 +60,10 @@ function Sidebar() {
         })}
       </nav>
 
-      <button className="sidebar-logout">
-        <LogOut size={20} />
+      <button
+  className="sidebar-logout"
+  onClick={handleLogout}
+>
         <span>Sair</span>
       </button>
     </aside>

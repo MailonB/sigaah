@@ -17,6 +17,7 @@ const necessidadeEspecialRoutes =
   require('./routes/movimentacaoEstoque.routes');
   const dashboardRoutes =
   require('./routes/dashboard.routes');
+  const relatorioRoutes = require('./routes/relatorio.routes');
 
 const app = express();
 
@@ -33,5 +34,6 @@ app.use('/solicitacoes', solicitacaoAjudaRoutes);
 app.use('/estoque', itemEstoqueRoutes);
 app.use('/estoque', movimentacaoEstoqueRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/relatorios', relatorioRoutes);
 
 module.exports = app;
