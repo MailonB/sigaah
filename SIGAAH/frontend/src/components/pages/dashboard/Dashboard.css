@@ -118,3 +118,38 @@
   width: 100%;
   height: 300px;
 }
+
+.progress-fill.ocupacao-normal {
+  background: #2563eb;
+}
+
+.progress-fill.ocupacao-alerta {
+  background: #f59e0b;
+}
+
+.progress-fill.ocupacao-critica {
+  background: #dc2626;
+}
+
+.ocupacao-percentual {
+  font-weight: 700;
+}
+
+.ocupacao-percentual.ocupacao-normal {
+  color: #2563eb;
+}
+
+.ocupacao-percentual.ocupacao-alerta {
+  color: #f59e0b;
+}
+
+.ocupacao-percentual.ocupacao-critica {
+  color: #dc2626;
+}
+
+.ocupacao-critica-texto {
+  margin: 6px 0 0;
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 600;
+}

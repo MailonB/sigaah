@@ -173,3 +173,21 @@
   font-size: 15px;
   background: #ffffff;
 }
+.map-container {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  margin-top: 8px;
+}
+
+.map-help {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.leaflet-container {
+  width: 100%;
+  z-index: 1;
+}

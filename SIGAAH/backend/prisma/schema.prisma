@@ -27,14 +27,20 @@ model Abrigo {
   id          Int          @id @default(autoincrement())
   nome        String
   endereco    String
+  bairro      String?
   cidade      String
+  uf          String?
+  cep         String?
+  latitude    Float?
+  longitude   Float?
   capacidade  Int
   responsavel String
+  telefone    String?
   status      StatusAbrigo
 
-  pessoas PessoaAcolhida[]
-   solicitacoes SolicitacaoAjuda[]
-   itensEstoque ItemEstoque[]
+  pessoas      PessoaAcolhida[]
+  solicitacoes SolicitacaoAjuda[]
+  itensEstoque ItemEstoque[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

@@ -7,12 +7,14 @@ import {
   HeartHandshake,
   ClipboardList,
   LogOut,
+    Map,
 } from "lucide-react";
 import "./Sidebar.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { FileText } from "lucide-react";
 import { Siren } from "lucide-react";
+
 
 function Sidebar() {
 
@@ -32,7 +34,9 @@ const handleLogout = () => {
     { label: "Voluntários", path: "/voluntarios", icon: HeartHandshake },
     { label: "Solicitações", path: "/solicitacoes", icon: ClipboardList },
     { label: "Relatórios", path: "/relatorios", icon: FileText },
-    { label: "Central de Operações", path: "/central", icon: Siren },];
+    { label: "Central de Operações", path: "/central", icon: Siren },
+    { label: "Mapa Operacional", path: "/mapa-operacional", icon: Map },];
+    
 
   return (
     <aside className="sidebar">

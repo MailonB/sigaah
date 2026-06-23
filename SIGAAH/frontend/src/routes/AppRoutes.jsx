@@ -17,6 +17,7 @@ import ListarSolicitacoes from "../components/pages/solicitacoes/ListarSolicitac
 import FormSolicitacao from "../components/pages/solicitacoes/FormSolicitacao";
 import Relatorios from "../components/pages/relatorios/Relatorios";
 import CentralOperacoes from "../components/pages/central/CentralOperacoes";
+import MapaOperacional from "../components/pages/mapa/MapaOperacional";
 
 function Placeholder({ title }) {
   return (
@@ -237,6 +238,17 @@ function AppRoutes() {
     <PrivateRoute>
       <Layout>
         <CentralOperacoes />
+      </Layout>
+    </PrivateRoute>
+  }
+
+/>
+<Route
+  path="/mapa-operacional"
+  element={
+    <PrivateRoute>
+      <Layout>
+        <MapaOperacional />
       </Layout>
     </PrivateRoute>
   }

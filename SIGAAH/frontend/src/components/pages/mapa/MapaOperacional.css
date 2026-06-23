@@ -1,0 +1,173 @@
+.mapa-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mapa-resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.mapa-resumo div {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.mapa-resumo span {
+  display: block;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.mapa-resumo strong {
+  font-size: 1.8rem;
+}
+
+.mapa-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.mapa-leaflet {
+  height: 600px;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.mapa-vazio {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px;
+  color: #666;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.popup-abrigo h4 {
+  margin: 0 0 8px;
+}
+
+.popup-abrigo p {
+  margin: 4px 0;
+}
+
+@media (max-width: 900px) {
+  .mapa-resumo {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mapa-leaflet {
+    height: 450px;
+  }
+}
+
+@media (max-width: 600px) {
+  .mapa-resumo {
+    grid-template-columns: 1fr;
+  }
+}
+.mapa-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.mapa-legenda span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #444;
+  font-size: 0.92rem;
+}
+
+.legenda-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legenda-dot.ativo {
+  background: #16a34a;
+}
+
+.legenda-dot.lotado {
+  background: #dc2626;
+}
+
+.legenda-dot.manutencao {
+  background: #f97316;
+}
+
+.legenda-dot.inativo {
+  background: #6b7280;
+}
+
+.custom-map-marker {
+  background: transparent;
+  border: none;
+}
+
+.popup-abrigo {
+  min-width: 230px;
+}
+
+.popup-abrigo h4 {
+  margin: 8px 0 10px;
+  font-size: 1rem;
+}
+
+.popup-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.popup-status.ativo {
+  background: #16a34a;
+}
+
+.popup-status.lotado {
+  background: #dc2626;
+}
+
+.popup-status.manutencao {
+  background: #f97316;
+}
+
+.popup-status.inativo {
+  background: #6b7280;
+}
+
+.popup-info p {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 7px 0;
+}
+
+.popup-info strong {
+  color: #333;
+  font-size: 0.78rem;
+}
+
+.popup-info span {
+  color: #555;
+  font-size: 0.9rem;
+}

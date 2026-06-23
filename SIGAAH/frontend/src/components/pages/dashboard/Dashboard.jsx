@@ -90,18 +90,22 @@ function Dashboard() {
               <div key={abrigo.id} className="ocupacao-item">
                 <div className="ocupacao-header">
                   <strong>{abrigo.nome}</strong>
-                  <span>{abrigo.percentualOcupacao}%</span>
+                  <span className={`ocupacao-percentual ${getClasseOcupacao(abrigo.percentualOcupacao)}`}>
+                  {abrigo.percentualOcupacao}%
+                </span>
                 </div>
 
                 <div className="progress-bar">
                   <div
-                    className="progress-fill"
-                    style={{ width: `${abrigo.percentualOcupacao}%` }}
+                    className={`progress-fill ${getClasseOcupacao(abrigo.percentualOcupacao)}`}
+                    style={{
+                      width: `${Math.min(Number(abrigo.percentualOcupacao), 100)}%`,
+                    }}
                   />
                 </div>
 
                 <small>
-                  {abrigo.ocupados} ocupados / {abrigo.capacidade} capacidade —
+                  {abrigo.ocupados} ocupados / {abrigo.capacidade} capacidade: 
                   {abrigo.vagasDisponiveis} vagas disponíveis
                 </small>
               </div>
@@ -198,6 +202,15 @@ function Card({ titulo, valor, alerta }) {
       <strong>{valor}</strong>
     </div>
   );
+}
+
+function getClasseOcupacao(percentual) {
+  const valor = Number(percentual);
+
+  if (valor >= 100) return "ocupacao-critica";
+  if (valor >= 80) return "ocupacao-alerta";
+
+  return "ocupacao-normal";
 }
 
 export default Dashboard;

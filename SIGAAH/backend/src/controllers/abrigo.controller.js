@@ -40,75 +40,88 @@ class AbrigoController {
     }
   }
 
-  async criar(req, res) {
-    try {
+ async criar(req, res) {
+  try {
+    const {
+      nome,
+      endereco,
+      bairro,
+      cidade,
+      uf,
+      cep,
+      latitude,
+      longitude,
+      capacidade,
+      responsavel,
+      telefone,
+      status
+    } = req.body;
 
-      const {
+    const abrigo = await prisma.abrigo.create({
+      data: {
         nome,
         endereco,
+        bairro,
         cidade,
+        uf,
+        cep,
+        latitude: latitude ? Number(latitude) : null,
+        longitude: longitude ? Number(longitude) : null,
         capacidade,
         responsavel,
+        telefone,
         status
-      } = req.body;
+      }
+    });
 
-      const abrigo = await prisma.abrigo.create({
-        data: {
-          nome,
-          endereco,
-          cidade,
-          capacidade,
-          responsavel,
-          status
-        }
-      });
-
-      return res.status(201).json(abrigo);
-
-    } catch (error) {
-      return res.status(500).json({
-        erro: error.message
-      });
-    }
+    return res.status(201).json(abrigo);
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
   }
+}
 
-  async atualizar(req, res) {
-    try {
+async atualizar(req, res) {
+  try {
+    const { id } = req.params;
 
-      const { id } = req.params;
+    const {
+      nome,
+      endereco,
+      bairro,
+      cidade,
+      uf,
+      cep,
+      latitude,
+      longitude,
+      capacidade,
+      responsavel,
+      telefone,
+      status
+    } = req.body;
 
-      const {
+    const abrigo = await prisma.abrigo.update({
+      where: { id: Number(id) },
+      data: {
         nome,
         endereco,
+        bairro,
         cidade,
+        uf,
+        cep,
+        latitude: latitude ? Number(latitude) : null,
+        longitude: longitude ? Number(longitude) : null,
         capacidade,
         responsavel,
+        telefone,
         status
-      } = req.body;
+      }
+    });
 
-      const abrigo = await prisma.abrigo.update({
-        where: {
-          id: Number(id)
-        },
-        data: {
-          nome,
-          endereco,
-          cidade,
-          capacidade,
-          responsavel,
-          status
-        }
-      });
-
-      return res.json(abrigo);
-
-    } catch (error) {
-      return res.status(500).json({
-        erro: error.message
-      });
-    }
+    return res.json(abrigo);
+  } catch (error) {
+    return res.status(500).json({ erro: error.message });
   }
-
+}
   async excluir(req, res) {
     try {
 

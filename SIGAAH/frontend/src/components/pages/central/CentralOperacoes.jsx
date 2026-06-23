@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import "./CentralOperacoes.css";
+import PainelClimatico from "./PainelClimatico";
+import MiniMapaOperacional from "./MiniMapaOperacional";
 
 function CentralOperacoes() {
   const [resumo, setResumo] = useState(null);
@@ -72,6 +74,7 @@ function CentralOperacoes() {
         <Card titulo="Estoque Baixo" valor={resumo.estoqueBaixo} alerta />
         <Card titulo="Solicitações Abertas" valor={resumo.solicitacoesAbertas} alerta />
       </div>
+      <PainelClimatico />
 
       <div className="central-grid">
         <section className="central-panel danger">
@@ -108,6 +111,7 @@ function CentralOperacoes() {
           )}
         </section>
       </div>
+      <MiniMapaOperacional />
 
       <div className="central-grid">
         <section className="central-panel">
