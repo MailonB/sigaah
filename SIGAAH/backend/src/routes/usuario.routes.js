@@ -22,8 +22,8 @@ router.get(
 
 router.post(
   '/',
-  authMiddleware,
-  permitir('ADMIN'),
+  //authMiddleware,
+  //permitir('ADMIN'),
   usuarioController.criar
 );
 
