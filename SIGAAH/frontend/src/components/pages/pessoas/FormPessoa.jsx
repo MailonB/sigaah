@@ -8,8 +8,10 @@ import {
 import { listarAbrigos } from "../../../services/abrigoService";
 import {
   criarNecessidade,
+  atualizarNecessidade,
   excluirNecessidade,
 } from "../../../services/necessidadeService";
+
 import "./Pessoas.css";
 
 function FormPessoa() {
@@ -34,6 +36,8 @@ function FormPessoa() {
 
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState("");
+  const [necessidadeEditandoIndex, setNecessidadeEditandoIndex] = useState(null);
+  const [necessidadeEditandoId, setNecessidadeEditandoId] = useState(null);
 
   useEffect(() => {
     async function carregarDados() {
@@ -84,14 +88,49 @@ function FormPessoa() {
       return;
     }
 
-    const novaNecessidade = {
+    const dadosNecessidade = {
       tipo: form.tipoNecessidade,
       descricao: form.descricaoNecessidade || null,
     };
 
+    if (necessidadeEditandoIndex !== null) {
+      try {
+        let necessidadeAtualizada = {
+          ...form.necessidades[necessidadeEditandoIndex],
+          ...dadosNecessidade,
+        };
+
+        if (editando && necessidadeEditandoId) {
+          const response = await atualizarNecessidade(
+            id,
+            necessidadeEditandoId,
+            dadosNecessidade
+          );
+
+          necessidadeAtualizada = response.data;
+        }
+
+        setForm((prev) => ({
+          ...prev,
+          necessidades: prev.necessidades.map((item, index) =>
+            index === necessidadeEditandoIndex ? necessidadeAtualizada : item
+          ),
+          tipoNecessidade: "",
+          descricaoNecessidade: "",
+        }));
+
+        setNecessidadeEditandoIndex(null);
+        setNecessidadeEditandoId(null);
+      } catch (error) {
+        alert(error.response?.data?.erro || "Erro ao atualizar necessidade.");
+      }
+
+      return;
+    }
+
     if (editando) {
       try {
-        const response = await criarNecessidade(id, novaNecessidade);
+        const response = await criarNecessidade(id, dadosNecessidade);
 
         setForm((prev) => ({
           ...prev,
@@ -108,9 +147,21 @@ function FormPessoa() {
 
     setForm((prev) => ({
       ...prev,
-      necessidades: [...prev.necessidades, novaNecessidade],
+      necessidades: [...prev.necessidades, dadosNecessidade],
       tipoNecessidade: "",
       descricaoNecessidade: "",
+    }));
+  }
+  function editarNecessidade(index) {
+    const necessidade = form.necessidades[index];
+
+    setNecessidadeEditandoIndex(index);
+    setNecessidadeEditandoId(necessidade.id || null);
+
+    setForm((prev) => ({
+      ...prev,
+      tipoNecessidade: necessidade.tipo || "",
+      descricaoNecessidade: necessidade.descricao || "",
     }));
   }
 
@@ -132,6 +183,17 @@ function FormPessoa() {
       ...prev,
       necessidades: prev.necessidades.filter((_, i) => i !== index),
     }));
+
+    if (necessidadeEditandoIndex === index) {
+      setNecessidadeEditandoIndex(null);
+      setNecessidadeEditandoId(null);
+
+      setForm((prev) => ({
+        ...prev,
+        tipoNecessidade: "",
+        descricaoNecessidade: "",
+      }));
+    }
   }
 
   async function handleSubmit(e) {
@@ -290,7 +352,9 @@ function FormPessoa() {
             className="btn-secondary"
             onClick={adicionarNecessidade}
           >
-            Adicionar necessidade
+            {necessidadeEditandoIndex !== null
+              ? "Salvar alteração da necessidade"
+              : "Adicionar necessidade"}
           </button>
 
           {form.necessidades.length > 0 && (
@@ -308,7 +372,15 @@ function FormPessoa() {
                   <tr key={item.id || index}>
                     <td>{item.tipo}</td>
                     <td>{item.descricao || "-"}</td>
-                    <td>
+                    <td className="actions">
+                      <button
+                        type="button"
+                        className="btn-edit"
+                        onClick={() => editarNecessidade(index)}
+                      >
+                        Editar
+                      </button>
+
                       <button
                         type="button"
                         className="btn-delete"

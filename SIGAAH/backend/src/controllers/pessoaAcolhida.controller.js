@@ -1,58 +1,135 @@
-const prisma = require('../config/prisma');
+const prisma = require("../config/prisma");
 
 class PessoaAcolhidaController {
-
   async listar(req, res) {
     try {
-
       const pessoas = await prisma.pessoaAcolhida.findMany({
         include: {
           abrigo: true,
-          necessidades: true
-        }
+          necessidades: true,
+        },
+        orderBy: {
+          id: "desc",
+        },
       });
 
       return res.json(pessoas);
-
     } catch (error) {
       return res.status(500).json({
-        erro: error.message
+        erro: error.message,
       });
     }
   }
 
   async buscarPorId(req, res) {
     try {
-
       const { id } = req.params;
 
       const pessoa = await prisma.pessoaAcolhida.findUnique({
         where: {
-          id: Number(id)
+          id: Number(id),
         },
         include: {
           abrigo: true,
-          necessidades: true
-        }
+          necessidades: true,
+        },
       });
 
       if (!pessoa) {
         return res.status(404).json({
-          erro: 'Pessoa acolhida não encontrada'
+          erro: "Pessoa acolhida não encontrada",
         });
       }
 
       return res.json(pessoa);
-
     } catch (error) {
       return res.status(500).json({
-        erro: error.message
+        erro: error.message,
       });
     }
   }
 
   async criar(req, res) {
     try {
+      const {
+        nome,
+        cpf,
+        dataNascimento,
+        telefone,
+        observacoes,
+        sexo,
+        abrigoId,
+        necessidades,
+      } = req.body;
+
+      const abrigo = await prisma.abrigo.findUnique({
+        where: {
+          id: Number(abrigoId),
+        },
+      });
+
+      if (!abrigo) {
+        return res.status(404).json({
+          erro: "Abrigo não encontrado",
+        });
+      }
+
+      if (cpf) {
+        const cpfExistente = await prisma.pessoaAcolhida.findUnique({
+          where: {
+            cpf,
+          },
+        });
+
+        if (cpfExistente) {
+          return res.status(400).json({
+            erro: "CPF já cadastrado",
+          });
+        }
+      }
+
+      const pessoa = await prisma.pessoaAcolhida.create({
+        data: {
+          nome,
+          cpf,
+          dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+          telefone,
+          observacoes,
+          sexo,
+          abrigoId: Number(abrigoId),
+          necessidades: {
+            create: necessidades || [],
+          },
+        },
+        include: {
+          abrigo: true,
+          necessidades: true,
+        },
+      });
+
+      return res.status(201).json(pessoa);
+    } catch (error) {
+      return res.status(500).json({
+        erro: error.message,
+      });
+    }
+  }
+
+  async atualizar(req, res) {
+    try {
+      const { id } = req.params;
+
+      const pessoaExiste = await prisma.pessoaAcolhida.findUnique({
+        where: {
+          id: Number(id),
+        },
+      });
+
+      if (!pessoaExiste) {
+        return res.status(404).json({
+          erro: "Pessoa acolhida não encontrada",
+        });
+      }
 
       const {
         nome,
@@ -62,192 +139,236 @@ class PessoaAcolhidaController {
         observacoes,
         sexo,
         abrigoId,
-        necessidades
+        status,
       } = req.body;
 
-     
-      const abrigo = await prisma.abrigo.findUnique({
-        where: {
-          id: Number(abrigoId)
-        }
-      });
-
-      if (!abrigo) {
-        return res.status(404).json({
-          erro: 'Abrigo não encontrado'
-        });
-      }
-
-      if (cpf) {
-
+      if (cpf && cpf !== pessoaExiste.cpf) {
         const cpfExistente = await prisma.pessoaAcolhida.findUnique({
           where: {
-            cpf
-          }
+            cpf,
+          },
         });
 
         if (cpfExistente) {
           return res.status(400).json({
-            erro: 'CPF já cadastrado'
+            erro: "CPF já cadastrado",
           });
         }
       }
 
-      const pessoa = await prisma.pessoaAcolhida.create({
+      if (abrigoId) {
+        const abrigo = await prisma.abrigo.findUnique({
+          where: {
+            id: Number(abrigoId),
+          },
+        });
+
+        if (!abrigo) {
+          return res.status(404).json({
+            erro: "Abrigo não encontrado",
+          });
+        }
+      }
+
+      const pessoa = await prisma.pessoaAcolhida.update({
+        where: {
+          id: Number(id),
+        },
         data: {
-          nome,
-          cpf,
+          nome: nome ?? pessoaExiste.nome,
+          cpf: cpf ?? pessoaExiste.cpf,
+          telefone: telefone ?? pessoaExiste.telefone,
+          observacoes: observacoes ?? pessoaExiste.observacoes,
+          sexo: sexo ?? pessoaExiste.sexo,
+          status: status ?? pessoaExiste.status,
+          abrigoId: abrigoId ? Number(abrigoId) : pessoaExiste.abrigoId,
           dataNascimento: dataNascimento
             ? new Date(dataNascimento)
-            : null,
-          telefone,
-          observacoes,
-          sexo,
-          abrigoId: Number(abrigoId),
-          necessidades: {
-            create: necessidades || []
-          }
+            : pessoaExiste.dataNascimento,
         },
         include: {
           abrigo: true,
-          necessidades: true
-        }
+          necessidades: true,
+        },
       });
 
-      return res.status(201).json(pessoa);
-
+      return res.json(pessoa);
     } catch (error) {
       return res.status(500).json({
-        erro: error.message
+        erro: error.message,
       });
     }
   }
-  async atualizar(req, res) {
-  try {
 
-    const { id } = req.params;
+  async desligar(req, res) {
+    try {
+      const { id } = req.params;
 
-    const pessoaExiste = await prisma.pessoaAcolhida.findUnique({
-      where: {
-        id: Number(id)
-      }
-    });
-
-    if (!pessoaExiste) {
-      return res.status(404).json({
-        erro: 'Pessoa acolhida não encontrada'
-      });
-    }
-
-    const {
-      nome,
-      cpf,
-      dataNascimento,
-      telefone,
-      observacoes,
-      sexo,
-      abrigoId,
-      status
-    } = req.body;
-
-    if (cpf && cpf !== pessoaExiste.cpf) {
-
-      const cpfExistente = await prisma.pessoaAcolhida.findUnique({
+      const pessoa = await prisma.pessoaAcolhida.findUnique({
         where: {
-          cpf
-        }
+          id: Number(id),
+        },
       });
 
-      if (cpfExistente) {
-        return res.status(400).json({
-          erro: 'CPF já cadastrado'
-        });
-      }
-    }
-
-    if (abrigoId) {
-
-      const abrigo = await prisma.abrigo.findUnique({
-        where: {
-          id: Number(abrigoId)
-        }
-      });
-
-      if (!abrigo) {
+      if (!pessoa) {
         return res.status(404).json({
-          erro: 'Abrigo não encontrado'
+          erro: "Pessoa acolhida não encontrada",
         });
       }
-    }
 
-    const pessoa = await prisma.pessoaAcolhida.update({
-      where: {
-        id: Number(id)
-      },
-      data: {
-        nome: nome ?? pessoaExiste.nome,
-        cpf: cpf ?? pessoaExiste.cpf,
-        telefone: telefone ?? pessoaExiste.telefone,
-        observacoes: observacoes ?? pessoaExiste.observacoes,
-        sexo: sexo ?? pessoaExiste.sexo,
-        status: status ?? pessoaExiste.status,
-        abrigoId: abrigoId ?? pessoaExiste.abrigoId,
-        dataNascimento: dataNascimento
-          ? new Date(dataNascimento)
-          : pessoaExiste.dataNascimento
-          
-      },
-      include: {
-        abrigo: true,
-        necessidades: true
-      }
-    });
+      await prisma.pessoaAcolhida.update({
+        where: {
+          id: Number(id),
+        },
+        data: {
+          status: "DESLIGADO",
+        },
+      });
 
-    return res.json(pessoa);
-
-  } catch (error) {
-    return res.status(500).json({
-      erro: error.message
-    });
-  }
-}
-async desligar(req, res) {
-  try {
-
-    const { id } = req.params;
-
-    const pessoa = await prisma.pessoaAcolhida.findUnique({
-      where: {
-        id: Number(id)
-      }
-    });
-
-    if (!pessoa) {
-      return res.status(404).json({
-        erro: 'Pessoa acolhida não encontrada'
+      return res.json({
+        mensagem: "Pessoa desligada com sucesso",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        erro: error.message,
       });
     }
-
-    await prisma.pessoaAcolhida.update({
-      where: {
-        id: Number(id)
-      },
-      data: {
-        status: 'DESLIGADO'
-      }
-    });
-
-    return res.json({
-      mensagem: 'Pessoa desligada com sucesso'
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      erro: error.message
-    });
   }
-}
 
+  async listarNecessidades(req, res) {
+    try {
+      const { pessoaId } = req.params;
+
+      const pessoa = await prisma.pessoaAcolhida.findUnique({
+        where: {
+          id: Number(pessoaId),
+        },
+      });
+
+      if (!pessoa) {
+        return res.status(404).json({
+          erro: "Pessoa acolhida não encontrada",
+        });
+      }
+
+      const necessidades = await prisma.necessidadeEspecial.findMany({
+        where: {
+          pessoaAcolhidaId: Number(pessoaId),
+        },
+        orderBy: {
+          id: "desc",
+        },
+      });
+
+      return res.json(necessidades);
+    } catch (error) {
+      return res.status(500).json({
+        erro: error.message,
+      });
+    }
+  }
+
+  async criarNecessidade(req, res) {
+    try {
+      const { pessoaId } = req.params;
+      const { tipo, descricao } = req.body;
+
+      const pessoa = await prisma.pessoaAcolhida.findUnique({
+        where: {
+          id: Number(pessoaId),
+        },
+      });
+
+      if (!pessoa) {
+        return res.status(404).json({
+          erro: "Pessoa acolhida não encontrada",
+        });
+      }
+
+      const necessidade = await prisma.necessidadeEspecial.create({
+        data: {
+          tipo,
+          descricao,
+          pessoaAcolhidaId: Number(pessoaId),
+        },
+      });
+
+      return res.status(201).json(necessidade);
+    } catch (error) {
+      return res.status(500).json({
+        erro: error.message,
+      });
+    }
+  }
+
+  async atualizarNecessidade(req, res) {
+    try {
+      const { pessoaId, necessidadeId } = req.params;
+      const { tipo, descricao } = req.body;
+
+      const necessidadeExiste = await prisma.necessidadeEspecial.findFirst({
+        where: {
+          id: Number(necessidadeId),
+          pessoaAcolhidaId: Number(pessoaId),
+        },
+      });
+
+      if (!necessidadeExiste) {
+        return res.status(404).json({
+          erro: "Necessidade não encontrada para esta pessoa",
+        });
+      }
+
+      const necessidade = await prisma.necessidadeEspecial.update({
+        where: {
+          id: Number(necessidadeId),
+        },
+        data: {
+          tipo: tipo ?? necessidadeExiste.tipo,
+          descricao: descricao ?? necessidadeExiste.descricao,
+        },
+      });
+
+      return res.json(necessidade);
+    } catch (error) {
+      return res.status(500).json({
+        erro: error.message,
+      });
+    }
+  }
+
+  async excluirNecessidade(req, res) {
+    try {
+      const { pessoaId, necessidadeId } = req.params;
+
+      const necessidadeExiste = await prisma.necessidadeEspecial.findFirst({
+        where: {
+          id: Number(necessidadeId),
+          pessoaAcolhidaId: Number(pessoaId),
+        },
+      });
+
+      if (!necessidadeExiste) {
+        return res.status(404).json({
+          erro: "Necessidade não encontrada para esta pessoa",
+        });
+      }
+
+      await prisma.necessidadeEspecial.delete({
+        where: {
+          id: Number(necessidadeId),
+        },
+      });
+
+      return res.json({
+        mensagem: "Necessidade removida com sucesso",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        erro: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new PessoaAcolhidaController();

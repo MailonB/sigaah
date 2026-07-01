@@ -6,6 +6,11 @@
 .main-content {
   margin-left: 260px;
   min-height: 100vh;
+  transition: margin-left 0.25s ease;
+}
+
+.main-content-collapsed {
+  margin-left: 82px;
 }
 
 .page-content {
