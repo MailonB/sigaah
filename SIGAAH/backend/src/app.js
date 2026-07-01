@@ -7,23 +7,23 @@ const authRoutes = require('./routes/auth.routes');
 const pessoaAcolhidaRoutes = require('./routes/pessoaAcolhida.routes');
 const necessidadeEspecialRoutes =
   require('./routes/necessidadeEspecial.routes');
-  const voluntarioRoutes =
+const voluntarioRoutes =
   require('./routes/voluntario.routes');
-  const solicitacaoAjudaRoutes =
+const solicitacaoAjudaRoutes =
   require('./routes/solicitacaoAjuda.routes');
-  const itemEstoqueRoutes =
+const itemEstoqueRoutes =
   require('./routes/itemEstoque.routes');
-  const movimentacaoEstoqueRoutes =
+const movimentacaoEstoqueRoutes =
   require('./routes/movimentacaoEstoque.routes');
-  const dashboardRoutes =
+const dashboardRoutes =
   require('./routes/dashboard.routes');
-  const relatorioRoutes = require('./routes/relatorio.routes');
-
+const relatorioRoutes = require('./routes/relatorio.routes');
+const mapaRoutes = require("./routes/mapa.routes");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+app.use('/mapa', mapaRoutes);
 app.use('/auth', authRoutes);
 app.use('/abrigos', abrigoRoutes);
 app.use('/usuarios', usuarioRoutes);
@@ -35,5 +35,6 @@ app.use('/estoque', itemEstoqueRoutes);
 app.use('/estoque', movimentacaoEstoqueRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/relatorios', relatorioRoutes);
+
 
 module.exports = app;

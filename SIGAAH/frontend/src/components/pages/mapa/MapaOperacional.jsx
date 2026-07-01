@@ -208,60 +208,16 @@ function MapaOperacional() {
     setCarregandoServicos(true);
     setErroServicos("");
 
-    const query = `
-      [out:json][timeout:25];
-      (
-        node["amenity"~"hospital|pharmacy"](around:${RAIO_BUSCA_METROS},${lat},${lng});
-        way["amenity"~"hospital|pharmacy"](around:${RAIO_BUSCA_METROS},${lat},${lng});
-        relation["amenity"~"hospital|pharmacy"](around:${RAIO_BUSCA_METROS},${lat},${lng});
-
-        node["healthcare"~"hospital|pharmacy"](around:${RAIO_BUSCA_METROS},${lat},${lng});
-        way["healthcare"~"hospital|pharmacy"](around:${RAIO_BUSCA_METROS},${lat},${lng});
-        relation["healthcare"~"hospital|pharmacy"](around:${RAIO_BUSCA_METROS},${lat},${lng});
-      );
-      out center tags;
-    `;
-
-    const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
-      query
-    )}`;
-
     try {
-      const response = await fetch(url);
+      const response = await api.get("/mapa/servicos-proximos", {
+        params: {
+          lat,
+          lng,
+          raio: RAIO_BUSCA_METROS,
+        },
+      });
 
-      if (!response.ok) {
-        throw new Error("Erro na consulta da Overpass API.");
-      }
-
-      const data = await response.json();
-
-      const resultado = data.elements
-        .map((item) => {
-          const itemLat = item.lat || item.center?.lat;
-          const itemLng = item.lon || item.center?.lon;
-
-          if (!itemLat || !itemLng) return null;
-
-          const tipoBase = item.tags?.amenity || item.tags?.healthcare;
-          const tipo = tipoBase === "hospital" ? "Hospital" : "Farmácia";
-
-          return {
-            id: `${item.type}-${item.id}`,
-            nome: item.tags?.name || `${tipo} sem nome cadastrado`,
-            tipo,
-            endereco: montarEndereco(item.tags),
-            lat: itemLat,
-            lng: itemLng,
-            distanciaKm: calcularDistanciaKm(lat, lng, itemLat, itemLng),
-          };
-        })
-        .filter(Boolean);
-
-      const resultadoSemDuplicados = Array.from(
-        new Map(resultado.map((item) => [item.id, item])).values()
-      ).sort((a, b) => a.distanciaKm - b.distanciaKm);
-
-      setServicosProximos(resultadoSemDuplicados);
+      setServicosProximos(response.data);
     } catch (error) {
       console.error(error);
       setErroServicos("Erro ao buscar hospitais e farmácias próximos.");
